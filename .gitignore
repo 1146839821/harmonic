@@ -1,0 +1,10 @@
+.vscode
+
+.directory
+
+# File withheld to make abuse more difficult
+game_payload/src/core.c
+
+build
+out
+harmonic*.zip
