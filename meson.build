@@ -1,4 +1,4 @@
-project('harmonic', 'c', version: '0.1.0')
+project('harmonic', 'c', version: '0.2.0')
 
 nasm = find_program('nasm')
 gen_res = find_program('gen_resources.sh')
