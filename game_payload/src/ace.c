@@ -21,3 +21,12 @@ HMODULE ace_load_base_module(void *init3Addr) {
     
     return base;
 }
+
+HMODULE ace_load_driver_module(void *coAddr) {
+    HMODULE base = utils_load_module_patched(L"AntiCheatExpert\\InGame\\x64\\ACE-DRV64.dll");
+    
+    void *co = GetProcAddress(base, "CreateObject");
+    utils_hook_address(co, coAddr);
+    
+    return base;
+}
