@@ -142,8 +142,15 @@ static void setup_dumper(const wchar_t *dumpPath) {
     wcscpy(sDumpPath, dumpPath);
    
     HMODULE dxgi = LoadLibraryA("dxgi.dll");
-    void *pCreateFactory = GetProcAddress(dxgi, "CreateDXGIFactory");
-    utils_hook_address(pCreateFactory, &dump);
+
+    const char *hookFunctions[] = {
+        "CreateDXGIFactory",
+        "CreateDXGIFactory1",
+        "CreateDXGIFactory2"
+    };
+    for (size_t i = 0; i < UTILS_COUNT(hookFunctions); i++) {
+        utils_hook_address(GetProcAddress(dxgi, hookFunctions[i]), &dump);
+    }
 
     // Fallback in case the CreateDXGIFactory hook did not get called
     ace_load_base_module(&fallback_dump);
