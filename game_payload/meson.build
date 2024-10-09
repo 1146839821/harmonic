@@ -40,6 +40,12 @@ else
     core_blob = [ 'blob/core.o' ]
 endif
 
+lzma_include_dir = include_directories('lzma_sdk')
+
+lzma_sources = [
+    'lzma_sdk/LzmaDec.c'
+]
+
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
 
@@ -49,8 +55,9 @@ shared_library(
     'game_payload',
     sources,
     core_target,
+    lzma_sources,
     conf,
     objects: core_blob,
-    include_directories: include_dir,
+    include_directories: [ include_dir, lzma_include_dir ],
     name_prefix: ''
 )
