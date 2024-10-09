@@ -13,24 +13,17 @@
 #define CSIZE_XK (0x6dfc36ff^0xfc4c53bf)
 #define CSIZE_AK (0xc68dd929^0x78bdb6e9)
 
-#pragma pack(push, 1)
-struct tlzma_header {
-    uint8_t  props[5];
-    uint8_t  _1[3];
-    uint32_t uncompressed_size;
-    uint32_t compressed_size;
-};
-#pragma pack(pop)
+#define GOOD_PROPS (0xcd386d0f^0x996f3a58)
 
-static void* _lzma_alloc(ISzAllocPtr p, size_t size) {
+static void* lzma_alloc(ISzAllocPtr p, size_t size) {
     return malloc(size);
 }
 
-static void _lzma_free(ISzAllocPtr p, void *address) {
+static void lzma_free(ISzAllocPtr p, void *address) {
     free(address);
 }
 
-static void _parse_header(void *header, struct tlzma_header *out) {
+static void parse_header(void *header, struct tlzma_header *out) {
     struct tlzma_header *raw = (struct tlzma_header *)header;
 
     for (size_t i = 0; i < UTILS_COUNT(raw->props); i++) {
@@ -40,14 +33,19 @@ static void _parse_header(void *header, struct tlzma_header *out) {
     out->compressed_size = (raw->compressed_size ^ CSIZE_XK) + CSIZE_AK;
 }
 
+int tlzma_test_header(void *header) {
+    struct tlzma_header *raw = (struct tlzma_header *)header;
+    return *((uint32_t*)(raw->props + 1)) == GOOD_PROPS;
+}
+
 void *tlzma_decode(void *output, void *input, size_t *outUSize, size_t *outCSize) {
     struct tlzma_header header;
-    _parse_header(input, &header);
+    parse_header(input, &header);
 
     void *data = ((uint8_t*)input) + sizeof(struct tlzma_header);
     void *buf = output ? output : malloc(header.uncompressed_size);
     
-    ISzAlloc alloc = { &_lzma_alloc, &_lzma_free };
+    ISzAlloc alloc = { &lzma_alloc, &lzma_free };
     SizeT destLen = header.uncompressed_size;
     SizeT srcLen = header.compressed_size;
     ELzmaStatus status;

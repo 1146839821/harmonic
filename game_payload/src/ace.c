@@ -1,5 +1,6 @@
 #include <msg.h>
 #include <utils.h>
+#include <tlzma.h>
 
 #include <ace.h>
 
@@ -29,4 +30,38 @@ HMODULE ace_load_driver_module(void *coAddr) {
     utils_hook_address(co, coAddr);
     
     return base;
+}
+
+static void ace_unpack_section(void *data, size_t size) {
+    void *packed = malloc(size);
+    memcpy(packed, data, size);
+
+    uint8_t *unpackedPtr = (uint8_t*)data;
+    uint8_t *packedPtr = (uint8_t*)packed;
+
+    while (tlzma_test_header(packedPtr)) {
+        size_t unpackedSize, packedSize;
+        tlzma_decode(unpackedPtr, packedPtr, &unpackedSize, &packedSize);
+
+        unpackedPtr += unpackedSize;
+        packedPtr += packedSize;
+    }
+
+    free(packed);
+}
+
+void ace_unpack_sections(HMODULE module) {
+    IMAGE_DOS_HEADER* dosHeader = (IMAGE_DOS_HEADER*)module;
+    IMAGE_NT_HEADERS64* ntHeaders = (IMAGE_NT_HEADERS64*)(((uint8_t*)module) + dosHeader->e_lfanew);
+
+    WORD sectionCount = ntHeaders->FileHeader.NumberOfSections;
+    IMAGE_SECTION_HEADER* sectionHeaders = (IMAGE_SECTION_HEADER*)(ntHeaders + 1);
+
+    for (WORD i = 0; i < sectionCount; i++) {
+        uint8_t *data = ((uint8_t*)module) + sectionHeaders[i].VirtualAddress;
+
+        if (tlzma_test_header(data)) {
+            ace_unpack_section(data, sectionHeaders[i].SizeOfRawData);
+        }
+    }
 }
