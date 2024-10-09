@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-#define DUMP_VERSION "2"
+#define DUMP_VERSION "3"
 
 char* core_do_dump(size_t *outSize);
 void core_do_load(char *dump, size_t size, void **outOEP);
