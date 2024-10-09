@@ -61,7 +61,15 @@ void ace_unpack_sections(HMODULE module) {
         uint8_t *data = ((uint8_t*)module) + sectionHeaders[i].VirtualAddress;
 
         if (tlzma_test_header(data)) {
-            ace_unpack_section(data, sectionHeaders[i].SizeOfRawData);
+            MEMORY_BASIC_INFORMATION memoryInfo;
+            VirtualQuery(data, &memoryInfo, sizeof(memoryInfo));
+            
+            DWORD oldProtect;
+            VirtualProtect(data, memoryInfo.RegionSize, PAGE_READWRITE, &oldProtect);
+
+            ace_unpack_section(data, memoryInfo.RegionSize);
+
+            VirtualProtect(data, memoryInfo.RegionSize, oldProtect, &oldProtect);
         }
     }
 }

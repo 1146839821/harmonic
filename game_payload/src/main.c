@@ -84,6 +84,22 @@ static void load(const wchar_t *dumpPath) {
 
     free(versionStr);
 
+    // Unpack sections
+    HMODULE exeModule = GetModuleHandleA(NULL);
+
+    LARGE_INTEGER frequency, unpackStart, unpackEnd;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&unpackStart);
+
+    ace_unpack_sections(exeModule);
+
+    QueryPerformanceCounter(&unpackEnd);
+    if (utils_env_enabled("HARMONIC_UNPACK_TIME")) {
+        uint64_t elapsed = unpackEnd.QuadPart - unpackStart.QuadPart;
+        double lfElapsed = (double)elapsed / (double)frequency.QuadPart;
+        msg_info_a("Unpacked in %.3lf seconds (%llu QPC ticks)", lfElapsed, elapsed);
+    }
+
     // Load
     core_do_load((char*)map.data, dumpSize, &oep);
 
