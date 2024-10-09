@@ -8,7 +8,8 @@ sources = [
     'src/pe.c',
     'src/utils.c',
     'src/msg.c',
-    'src/ace.c'
+    'src/ace.c',
+    'src/tlzma.c'
 ]
 
 if fs.exists('src/core.c')
