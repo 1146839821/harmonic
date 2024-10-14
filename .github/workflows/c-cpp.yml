@@ -5,19 +5,16 @@ on: push
 jobs:
   build:
     runs-on: macos-14
-    defaults:
-      run:
-        shell: arch -x86_64 zsh -e {0}
     steps:
-     - name: Setup x86 Development Environment
+     - name: Install Homebrew
        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
      - name: Install Development Environment
-       run :  /usr/local/bin/brew install ninja meson cmake || /usr/local/bin/brew link --overwrite python@3 && 
-              /usr/local/bin/brew install nasm mingw-w64
+       run:  /usr/local/bin/brew install ninja meson cmake || /usr/local/bin/brew link --overwrite python@3 && 
+             /usr/local/bin/brew install nasm mingw-w64
 
      - name: build
-       run : ./build.sh
+       run: ./build.sh
        
      - name: Upload
        uses: actions/upload-artifact@v4
