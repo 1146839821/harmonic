@@ -187,6 +187,10 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved) {
     // Bugtrace can go too
     utils_load_module_patched(L"AntiCheatExpert\\InGame\\x64\\ACE-Trace.dll");
 
+    // ACE-DRV64.dll
+    utils_load_module_patched(L"AntiCheatExpert\\InGame\\x64\\ACE-DRV64.dll");
+
+    
     this_module = instance;
 
     wchar_t dumpPath[MAX_PATH];
