@@ -26,8 +26,11 @@ jobs:
     - name: Build
       run: ./build.sh
       
+    - name: Tar
+      run: tar -zcf harmonic.tar.gz ./build/*
+        
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
           name: harmonic
-          path: out/harmonic.zip
+          path: harmonic.tar.gz
