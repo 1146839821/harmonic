@@ -107,13 +107,7 @@ static void load(const wchar_t *dumpPath) {
 
     // Handle the other AC part
     ace_load_shell_module();
-
-    if (!utils_env_enabled("HARMONIC_NO_AC")) {
-        ace_load_driver_module(&core_drv_co);
-    } else {
-        msg_info_a("Enabled full no-anticheat mode. You will likely experience periodic disconnects");
-        ace_load_base_module(&core_ace_init);
-    }
+    ace_load_base_module(&core_ace_init);
 }
 
 static void dump() {
@@ -180,12 +174,6 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved) {
     
     // Dynamically link functions from ntdll
     ntdll_link();
-
-    // Make CrashSight64 go away
-    utils_load_module_patched(L"CrashSight64.dll");
-
-    // Bugtrace can go too
-    utils_load_module_patched(L"AntiCheatExpert\\InGame\\x64\\ACE-Trace.dll");
 
     this_module = instance;
 
